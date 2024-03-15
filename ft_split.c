@@ -1,47 +1,73 @@
-char **ft_split(char const *s, char c)
+
+#include "libft.h"
+#include <stdlib.h>
+
+static int	count_words(const char *s, char c)
 {
-    char *foundat;
-    unsigned long long l1;
-    unsigned long long l2;
-    unsigned long long counter;
-    char **r;
+	int	count;
+	int	in_word;
 
-    counter = 0;
-    foundat = strchr(s, c);
+	count = 0;
+	in_word = 0;
+	while (*s)
+	{
+		if (*s == c)
+			in_word = 0;
+		else if (in_word == 0)
+		{
+			in_word = 1;
+			count++;
+		}
+		s++;
+	}
+	return (count);
+}
 
-    if (foundat == 0)
-    {
-        return (0);
-    }
-    r = (char **)malloc(sizeof(char*) * 2);
-    if (r == 0)
-    {
-        return 0;
-    }
-        l1 = foundat - s + 1;
-        l2 = strlen(s) - l1 + 1;
-      r[0] = (char*)malloc(sizeof(char) * (l1 + 1));
-      r[1] = (char*)malloc(sizeof(char) * (l2 + 1));
-    if (r[0] == 0 || r[1] == 0)
-    {
-        free(r[0]);
-        free(r[1]);
-        free(r);
-        return (0);
-    }
-    
-    while (counter < l1)
-      {
-        r[0][counter] = s[counter];
-        counter++;
-      }
-      r[0][counter] = '\0';
-      counter = 0;
-      while (counter < l2)
-      {
-        r[1][counter + 1] = s[counter + l1];
-        counter++;
-      }
-        r[1][counter + l1 - 1] = '\0';
-    return (r)
+static char	*strndup(const char *s, size_t n)
+{
+	char	*dup;
+
+	dup = (char *)malloc(sizeof(char) * (n + 1));
+	if (!dup)
+		return (0);
+	ft_memcpy(dup, s, n);
+	dup[n] = '\0';
+	return (dup);
+}
+
+char	**ft_split(char const *s, char c)
+{
+	int			word_count;
+	char		**result;
+	int			i;
+	const char	*start;
+
+void normbs(char const *s, char c)
+{
+    while (*s && *s == c)
+        s++
+    start = s;
+    while(*s && *s != c)
+        s++;
+}
+
+	if (!s)
+		return (0);
+	word_count = count_words(s, c);
+	result = (char **)malloc(sizeof(char *) * (word_count + 1));
+	if (!result)
+		return (0);
+	i = 0;
+	while (*s && i < word_count)
+	{
+		normbs(s, c);
+		result[i++] = strndup(start, s - start);
+		if (!result[i - 1])
+		{
+			while (i--)
+				free(result[i]), free(result);
+			return (0);
+		}
+	}
+    return (result[i] = 0, result);
 }
